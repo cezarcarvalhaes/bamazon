@@ -36,36 +36,56 @@ function customer() {
             )
         }
         inquirer.prompt([
-                {
-                    name: "buy",
-                    type: "input",
-                    message: "Please enter the ID number of the item you would like to purchase."
-                },
-                {
-                    name: "amount",
-                    type: "input",
-                    message: "Awesome. Now, how many would you like?"
-                }
-            ]).then(function(answer){
-                var itemSelect;
-                for (var i = 0; i < results.length; i++) {
-                  if (results[i].item_id == answer.buy) {
-                    itemSelect = results[i];
-                  }
+            {
+                name: "enter",
+                type: "confirm",
+                message: "Would you like to make a purchase?"
+            },
+        ]).then(function(answer){
 
-                }
-                if (answer.amount <= itemSelect.stock_quantity) {
-                    var totalPrice = parseFloat(answer.amount) * itemSelect.price
-                    console.log(`Success! You are purchasing ${answer.amount} ${itemSelect.product_name} for a total of $${totalPrice}`);
-                    var newAmount = itemSelect.stock_quantity - answer.amount;
-                    depleteStock(newAmount, itemSelect.item_id);
-                    console.log(results)
-                }
-                else {
-                    console.log(`Sorry, we only have ${itemSelect.stock_quantity} left in stock!`)
-                }
-            });
+            if (answer.enter) {
+                purchaseItem(results);
+            }
+            else {
+                console.log('Bummer! Maybe next time!')
+                connection.end();
+            }
+        });
+    });
+}
 
+function purchaseItem(res) {
+    var results = res;
+    inquirer.prompt([
+        {
+            name: "buy",
+            type: "input",
+            message: "Please enter the ID number of the item you would like to purchase."
+        },
+        {
+            name: "amount",
+            type: "input",
+            message: "Awesome. Now, how many would you like?"
+        }
+    ]).then(function(answer){
+        var itemSelect;
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].item_id == answer.buy) {
+            itemSelect = results[i];
+          }
+
+        }
+        if (answer.amount <= itemSelect.stock_quantity) {
+            var totalPrice = parseFloat(answer.amount) * itemSelect.price;
+            var newAmount = itemSelect.stock_quantity - answer.amount;
+            depleteStock(newAmount, itemSelect.item_id);
+            console.log(`\nSuccess! You are purchasing ${answer.amount} ${itemSelect.product_name} for a total of $${totalPrice}\n`);
+            customer();
+        }
+        else {
+            console.log(`\nSorry, we only have ${itemSelect.stock_quantity} left in stock!\n`)
+            customer();
+        }
     });
 }
 
