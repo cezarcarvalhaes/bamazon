@@ -1,0 +1,28 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "A CLI imitating an e-commerce site using mysql and inquirer.",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cezarcarvalhaes/bamazon.git"
+  },
+  "keywords": [
+    "CLI",
+    "Inquirer",
+    "mysql"
+  ],
+  "author": "Cezar Carvalhaes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cezarcarvalhaes/bamazon/issues"
+  },
+  "homepage": "https://github.com/cezarcarvalhaes/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^5.2.0",
+    "mysql": "^2.15.0"
+  }
+}
