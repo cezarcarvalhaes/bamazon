@@ -10,7 +10,7 @@ var connection = mysql.createConnection({
     database: 'bamazon'
 });
 
-//connection
+//On connection, start program
 connection.connect(function (error) {
     if (error) throw error;
     //If no errors, run our customer app
@@ -79,6 +79,7 @@ function purchaseItem(res) {
             var totalPrice = parseFloat(answer.amount) * itemSelect.price;
             var newAmount = itemSelect.stock_quantity - answer.amount;
             depleteStock(newAmount, itemSelect.item_id);
+            addRevenue(totalPrice, itemSelect.item_id, itemSelect.department_name);
             console.log(`\nSuccess! You are purchasing ${answer.amount} ${itemSelect.product_name} for a total of $${totalPrice}\n`);
             customer();
         }
@@ -103,5 +104,27 @@ function depleteStock(purchased, id){
                 if (error) throw error;
             }
     )
+};
+
+function addRevenue(total, id, dept){
+    connection.query (
+            "UPDATE products SET ? WHERE  ?",[
+                {
+                    product_sales: total
+                }, 
+                {
+                    item_id: id
+                }],
+            function(error) {
+                if (error) throw error;
+            }
+    )
+    connection.query (
+        "UPDATE departments SET product_sales = product_sales + ? WHERE department_name = ?",[total, dept],
+        function(error) {
+            if (error) throw error;
+        }
+)
+    
 };
 

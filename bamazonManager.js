@@ -2,6 +2,8 @@ var mysql = require('mysql');
 
 var inquirer = require('inquirer');
 
+var cTable = require('console.table')
+
 //var for connection to sql database
 var connection = mysql.createConnection({
     host: "localhost",
@@ -24,7 +26,7 @@ function options() {
             name: "options",
             type: "list",
             choices: ["View Products for Sale", "View Low Inventory", "Restock Inventory", "Add New Product", "Exit"],
-            message: "Welcome Manger! What would you like to do?"
+            message: "\n\nWelcome Manger! What would you like to do?\n"
         }
     ]).then(function (answer) {
         if (answer.options === "View Products for Sale") {
@@ -50,24 +52,15 @@ function options() {
 function viewProducts() {
     connection.query("SELECT * FROM products", function (error, results) {
         if (error) throw error;
-
-        for (var i = 0; i < results.length; i++) {
-            console.log(
-                `\nID: ${results[i].item_id}   Item: ${results[i].product_name}    Price: $${results[i].price}     Quantity: ${results[i].stock_quantity}`
-            )
-        }
+        console.table(results);
         options();
     });
 };
 
 function viewLowInventory() {
-    connection.query("SELECT * FROM products WHERE stock_quantity < 10", function (error, results) {
+    connection.query("SELECT * FROM products WHERE stock_quantity <= 10", function (error, results) {
         if (error) throw error;
-        for (var i = 0; i < results.length; i++) {
-            console.log(
-                `\nID: ${results[i].item_id}   Item: ${results[i].product_name}    Price: $${results[i].price}     Quantity: ${results[i].stock_quantity}`
-            )
-        }
+        console.table(results);
         options();
     });
 };
@@ -75,9 +68,15 @@ function viewLowInventory() {
 function restockInventory() {
     inquirer.prompt([
         {
-            name: "product",
+            name: "id",
             type: "input",
-            message: "What product would you like to restock?"
+            message: "Enter the ID number of the product to restock.",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                }
+                return false;
+            }
         },
         {
             name: "stock",
@@ -93,12 +92,12 @@ function restockInventory() {
     ])
         .then(function (answer) {
             connection.query(
-                "UPDATE products SET stock_quantity = stock_quantity + ? WHERE product_name = ?",
-                [answer.stock, answer.product],
+                "UPDATE products SET stock_quantity = stock_quantity + ? WHERE item_id = ?",
+                [answer.stock, answer.id],
                
                 function (err) {
                     if (err) throw err;
-                    console.log(`${answer.stock} ${answer.product} added!`);
+                    console.log(`Added ${answer.stock} to the stock quantity!`);
                     options();
                 }
             );
